@@ -1,4 +1,5 @@
 # recipe-app-api
+admin user admin@example.com, password
 
 ## Lint and Run tests 
 `
