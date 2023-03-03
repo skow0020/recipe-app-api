@@ -329,3 +329,45 @@ class PrivateRecipeApiTests(TestCase):
                 name=ingredient['name'], user=self.user
             ).exists()
             self.assertTrue(exists)
+
+    def test_create_ingredient_on_update(self):
+        """Test that creating an ingredient on update works"""
+        recipe = create_recipe(user=self.user)
+        ingredient_to_add = 'Cheese'
+
+        payload = {'ingredients': [{'name': ingredient_to_add}]}
+        url = detail_url(recipe.id)
+        res = self.client.patch(url, payload, format='json')
+
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+
+        new_ingredient = Ingredient.objects.get(user=self.user, name=ingredient_to_add)
+        self.assertIn(new_ingredient, recipe.ingredients.all())
+
+    def test_update_recipe_assign_ingredient(self):
+        """Test assigning an existing ingredient when updating a recipe"""
+        ingredient_cheese = Ingredient.objects.create(user=self.user, name='Cheese')
+        recipe = create_recipe(user=self.user)
+        recipe.ingredients.add(ingredient_cheese)
+
+        ingredient_lime = Ingredient.objects.create(user=self.user, name='Lime')
+        payload = {'ingredients': [{'name': 'Lime'}]}
+        url = detail_url(recipe.id)
+        res = self.client.patch(url, payload, format='json')
+
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        self.assertIn(ingredient_lime, recipe.ingredients.all())
+        self.assertNotIn(ingredient_cheese, recipe.ingredients.all())
+
+    def test_clear_recipe_ingredients(self):
+        """Test clearing ingredients from a recipe"""
+        ingredient_cheese = Ingredient.objects.create(user=self.user, name='Cheese')
+        recipe = create_recipe(user=self.user)
+        recipe.ingredients.add(ingredient_cheese)
+
+        payload = {'ingredients': []}
+        url = detail_url(recipe.id)
+        res = self.client.patch(url, payload, format='json')
+
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        self.assertEqual(recipe.ingredients.count(), 0)
