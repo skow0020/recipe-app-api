@@ -1,8 +1,8 @@
 """
 Database models for the core app.
 """
-import os
 import uuid
+import os
 
 from django.conf import settings
 from django.db import models

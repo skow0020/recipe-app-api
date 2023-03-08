@@ -17,6 +17,8 @@ docker-compose run --rm app sh -c "coverage run --source='.' --branch manage.py 
 docker-compose up
 `
 
+Documentation locally served at http://127.0.0.1:8000/api/docs/
+
 ## Coverage checks
 `
 docker-compose run --rm app sh -c "coverage report --fail-under=100 -m"
